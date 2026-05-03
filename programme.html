@@ -1,0 +1,1134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TechSmart ID Hub | Premium Student ID Printing Kenya</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        :root {
+            --bg: #0a0a0f;
+            --surface: rgba(15, 15, 25, 0.7);
+            --accent: #00d4ff;
+            --accent2: #7b2fff;
+            --gold: #daa520;
+            --primary: #f4a460;
+            --navy: #1a1f35;
+            --dark: #0f1119;
+            --darker: #080a10;
+            --text: #e0e0e0;
+            --text-muted: #a0a0b8;
+            --glass: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --card-bg: rgba(26, 31, 53, 0.7);
+            --radius: 20px;
+            --transition: 0.4s cubic-bezier(0.25, 0.8, 0.25, 1.2);
+        }
+
+        * { margin:0; padding:0; box-sizing:border-box; }
+
+        html {
+            scroll-behavior: smooth;
+            scrollbar-width: thin;
+            scrollbar-color: var(--accent) transparent;
+        }
+        ::-webkit-scrollbar { width:6px; }
+        ::-webkit-scrollbar-track { background:transparent; }
+        ::-webkit-scrollbar-thumb { background:var(--accent); border-radius:3px; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* 3D Canvas */
+        #three-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* Content Overlay */
+        .content-overlay {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Navigation */
+        nav {
+            position:fixed; top:0; width:100%; z-index:1000;
+            padding:1.2rem 5%; display:flex; justify-content:space-between;
+            align-items:center; transition:all 0.4s ease;
+            backdrop-filter:blur(0px);
+        }
+        nav.scrolled {
+            backdrop-filter:blur(20px);
+            background:rgba(10,10,15,0.85);
+            box-shadow:0 4px 30px rgba(0,0,0,0.4);
+            padding:0.8rem 5%;
+            border-bottom:1px solid var(--glass-border);
+        }
+
+        .logo {
+            font-family:'Playfair Display', serif; font-size:1.8rem;
+            font-weight:900; color:var(--text); text-decoration:none;
+            display:flex; align-items:center; gap:0.5rem;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+            background-clip:text;
+        }
+
+        .nav-links { display:flex; gap:2.5rem; list-style:none; }
+        .nav-links a {
+            color:var(--text-muted); text-decoration:none; font-weight:500;
+            font-size:0.95rem; transition:all 0.3s ease; position:relative;
+        }
+        .nav-links a:hover { color:#fff; }
+        .nav-links a::after {
+            content:''; position:absolute; bottom:-6px; left:0; width:0;
+            height:2px; background:var(--accent); transition:width 0.3s ease;
+            border-radius:2px;
+        }
+        .nav-links a:hover::after { width:100%; }
+
+        .cta-btn {
+            padding:0.6rem 1.5rem; border-radius:50px;
+            background:linear-gradient(135deg, var(--accent), var(--accent2));
+            color:#fff !important; font-weight:600 !important;
+            text-decoration:none; font-size:0.9rem; border:none;
+            cursor:pointer; transition:all 0.3s ease;
+            box-shadow:0 4px 20px rgba(0,212,255,0.25);
+        }
+        .cta-btn:hover {
+            box-shadow:0 8px 35px rgba(0,212,255,0.45);
+            transform:translateY(-2px);
+        }
+        .cta-btn::after { display:none !important; }
+
+        .mobile-menu-btn {
+            display:none; background:none; border:none;
+            color:var(--text); font-size:1.5rem; cursor:pointer;
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height:100vh; display:flex; align-items:center;
+            padding:0 5%; position:relative;
+        }
+        .hero-content { max-width:700px; }
+        .hero-badge {
+            display:inline-flex; align-items:center; gap:0.5rem;
+            padding:0.5rem 1.3rem; border-radius:50px;
+            background:var(--glass); border:1px solid var(--glass-border);
+            font-size:0.85rem; color:var(--accent);
+            letter-spacing:2px; text-transform:uppercase;
+            margin-bottom:1.5rem; backdrop-filter:blur(10px);
+            animation:fadeInUp 0.8s ease forwards;
+            animation-delay:0.2s; opacity:0; animation-fill-mode:forwards;
+        }
+        @keyframes fadeInUp {
+            from { opacity:0; transform:translateY(40px); }
+            to { opacity:1; transform:translateY(0); }
+        }
+        .hero h1 {
+            font-family:'Playfair Display', serif;
+            font-size:clamp(2.8rem,7vw,4.8rem);
+            font-weight:900; line-height:1.05; margin-bottom:1.2rem;
+            letter-spacing:-1.5px;
+            animation:fadeInUp 0.8s ease forwards;
+            animation-delay:0.35s; opacity:0; animation-fill-mode:forwards;
+        }
+        .hero h1 .gradient-text {
+            background:linear-gradient(135deg, var(--accent) 0%, #fff 50%, var(--accent2) 100%);
+            -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+            background-clip:text; background-size:200% 200%;
+            animation:gradient-shift 4s ease infinite;
+        }
+        @keyframes gradient-shift {
+            0%,100% { background-position:0% 50%; }
+            50% { background-position:100% 50%; }
+        }
+        .hero p {
+            font-size:1.2rem; color:var(--text-muted);
+            max-width:550px; margin-bottom:2.5rem;
+            animation:fadeInUp 0.8s ease forwards;
+            animation-delay:0.5s; opacity:0; animation-fill-mode:forwards;
+        }
+        .hero-buttons {
+            display:flex; gap:1.2rem; flex-wrap:wrap;
+            animation:fadeInUp 0.8s ease forwards;
+            animation-delay:0.65s; opacity:0; animation-fill-mode:forwards;
+        }
+        .btn {
+            padding:0.85rem 2.2rem; border-radius:50px;
+            font-weight:600; font-size:0.95rem; text-decoration:none;
+            letter-spacing:0.4px; cursor:pointer; border:none;
+            transition:all 0.35s ease; position:relative; overflow:hidden;
+        }
+        .btn-primary {
+            background:linear-gradient(135deg, var(--accent), var(--accent2));
+            color:#fff; box-shadow:0 8px 35px rgba(0,212,255,0.3);
+        }
+        .btn-primary:hover {
+            box-shadow:0 14px 45px rgba(0,212,255,0.5);
+            transform:translateY(-3px);
+        }
+        .btn-secondary {
+            background:transparent; color:#fff;
+            border:2px solid rgba(255,255,255,0.3);
+        }
+        .btn-secondary:hover {
+            border-color:#fff; background:rgba(255,255,255,0.05);
+            transform:translateY(-3px);
+        }
+
+        /* Sections */
+        .section { padding:8rem 5%; position:relative; }
+        .section-inner { max-width:1200px; margin:0 auto; }
+        .section-header { text-align:center; max-width:700px; margin:0 auto 5rem; }
+        .section-label {
+            font-size:0.8rem; text-transform:uppercase; letter-spacing:3px;
+            color:var(--accent); margin-bottom:0.8rem; font-weight:600;
+        }
+        .section-title {
+            font-family:'Playfair Display', serif;
+            font-size:clamp(2rem,4vw,3.2rem); font-weight:800;
+            letter-spacing:-1px; margin-bottom:1rem; line-height:1.15;
+        }
+        .section-desc { color:var(--text-muted); font-size:1.05rem; }
+
+        /* Stats */
+        .stats { padding:5rem 5%; }
+        .stats-grid {
+            display:grid; grid-template-columns:repeat(4, 1fr);
+            gap:2rem; max-width:1200px; margin:0 auto;
+        }
+        .stat-card {
+            text-align:center; padding:2rem;
+            background:var(--surface); backdrop-filter:blur(16px);
+            -webkit-backdrop-filter:blur(16px);
+            border:1px solid var(--glass-border); border-radius:var(--radius);
+            transition:all 0.4s ease;
+        }
+        .stat-card:hover {
+            border-color:rgba(0,212,255,0.4);
+            transform:translateY(-5px);
+            box-shadow:0 20px 60px rgba(0,0,0,0.5);
+        }
+        .stat-number {
+            font-size:3rem; font-weight:900;
+            background:linear-gradient(135deg, var(--accent), #fff);
+            -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+            background-clip:text; display:block; margin-bottom:0.5rem;
+        }
+        .stat-label { color:var(--text-muted); font-size:0.85rem; text-transform:uppercase; }
+
+        .quality-grid {
+            display:grid; grid-template-columns:repeat(3, 1fr);
+            gap:2rem;
+        }
+        .quality-card {
+            background:var(--surface); backdrop-filter:blur(16px);
+            -webkit-backdrop-filter:blur(16px);
+            border:1px solid var(--glass-border); border-radius:var(--radius);
+            padding:3rem 2rem; text-align:center;
+            transition:all 0.4s ease; position:relative; overflow:hidden;
+        }
+        .quality-card::before {
+            content:''; position:absolute; top:0; left:0; width:100%;
+            height:3px; background:linear-gradient(90deg, var(--accent), var(--accent2));
+            transform:scaleX(0); transition:transform 0.4s ease;
+        }
+        .quality-card:hover::before { transform:scaleX(1); }
+        .quality-card:hover {
+            transform:translateY(-10px);
+            border-color:rgba(0,212,255,0.4);
+            box-shadow:0 30px 60px rgba(0,0,0,0.6);
+        }
+        .quality-icon { font-size:3rem; margin-bottom:1.5rem; }
+        .quality-card h3 { font-size:1.3rem; margin-bottom:1rem; color:var(--text); }
+        .quality-card p { color:var(--text-muted); font-size:0.95rem; line-height:1.7; }
+
+        .portfolio-grid {
+            display:grid; grid-template-columns:repeat(3, 1fr);
+            gap:2rem;
+        }
+        .portfolio-item {
+            position:relative; border-radius:20px; overflow:hidden;
+            aspect-ratio:4/3; background:linear-gradient(135deg, #1e293b, #0f172a);
+            border:1px solid var(--glass-border); cursor:pointer;
+            transition:all 0.4s ease;
+        }
+        .portfolio-item:hover {
+            transform:scale(1.02);
+            border-color:var(--accent);
+            box-shadow:0 30px 60px rgba(0,212,255,0.3);
+        }
+        .portfolio-content {
+            position:absolute; inset:0; display:flex; flex-direction:column;
+            align-items:center; justify-content:center; padding:2rem;
+            background:linear-gradient(180deg, transparent 0%, rgba(10,10,15,0.9) 100%);
+        }
+        .portfolio-item h3 { font-size:1.2rem; margin-bottom:0.5rem; }
+        .portfolio-item p { color:var(--accent); font-size:0.85rem; }
+
+        .cta-section { padding:8rem 5%; text-align:center; }
+        .cta-box {
+            max-width:800px; margin:0 auto;
+            background:var(--surface); backdrop-filter:blur(20px);
+            border:1px solid var(--glass-border); border-radius:32px;
+            padding:4rem 3rem;
+        }
+        .cta-box h2 { font-family:'Playfair Display', serif; font-size:2.5rem; margin-bottom:1rem; }
+        .cta-box p { color:var(--text-muted); margin-bottom:2rem; font-size:1.1rem; }
+
+        footer {
+            padding:4rem 5% 2rem; border-top:1px solid var(--glass-border);
+            background:rgba(10,10,15,0.9);
+        }
+        .footer-content {
+            max-width:1200px; margin:0 auto;
+            display:grid; grid-template-columns:2fr 1fr 1fr 1fr; gap:3rem;
+        }
+        .footer-brand p { color:var(--text-muted); margin-top:1rem; font-size:0.9rem; line-height:1.7; }
+        .footer-links h4 { color:var(--text); margin-bottom:1.5rem; font-size:1rem; }
+        .footer-links ul { list-style:none; }
+        .footer-links li { margin-bottom:0.75rem; }
+        .footer-links a {
+            color:var(--text-muted); text-decoration:none; font-size:0.9rem;
+            transition:color 0.3s ease;
+        }
+        .footer-links a:hover { color:var(--accent); }
+        .footer-bottom {
+            max-width:1200px; margin:3rem auto 0; padding-top:2rem;
+            border-top:1px solid var(--glass-border); text-align:center;
+            color:var(--text-muted); font-size:0.85rem;
+        }
+        .social-icons {
+            display:flex; gap:1rem; justify-content:center;
+            margin-top:1rem; font-size:1.5rem;
+        }
+        .social-icons a { color:var(--accent); transition:all 0.3s ease; }
+        .social-icons a:hover { color:var(--accent2); transform:translateY(-3px); }
+
+        /* Chatbot */
+        .chatbot-container { position:fixed; bottom:30px; right:30px; z-index:9999; }
+        .chatbot-toggle {
+            width:60px; height:60px; border-radius:50%;
+            background:linear-gradient(135deg, var(--accent), var(--accent2));
+            border:none; cursor:pointer;
+            box-shadow:0 8px 25px rgba(0,212,255,0.4);
+            font-size:1.5rem; color:white; transition:all 0.3s ease;
+            display:flex; align-items:center; justify-content:center;
+            animation:pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%,100% { box-shadow:0 0 0 0 rgba(0,212,255,0.7); }
+            50% { box-shadow:0 0 0 20px rgba(0,212,255,0); }
+        }
+        .chatbot-toggle:hover { transform:scale(1.1); }
+        .chatbot-window {
+            position:absolute; bottom:80px; right:0; width:380px; height:550px;
+            background:rgba(10,10,15,0.98); border:1px solid var(--accent);
+            border-radius:20px; display:none; flex-direction:column;
+            overflow:hidden; backdrop-filter:blur(20px);
+            box-shadow:0 20px 60px rgba(0,0,0,0.9);
+        }
+        .chatbot-window.active { display:flex; }
+        .chatbot-header {
+            background:linear-gradient(135deg, var(--accent), var(--accent2));
+            padding:1rem; color:white; font-weight:600;
+            display:flex; justify-content:space-between; align-items:center;
+        }
+        .chatbot-messages {
+            flex:1; padding:1rem; overflow-y:auto;
+            display:flex; flex-direction:column; gap:0.8rem;
+        }
+        .message {
+            max-width:85%; padding:0.8rem 1rem; border-radius:15px;
+            font-size:0.9rem; line-height:1.4; animation:slideIn 0.3s ease;
+        }
+        @keyframes slideIn {
+            from { opacity:0; transform:translateY(10px); }
+            to { opacity:1; transform:translateY(0); }
+        }
+        .bot-message {
+            background:rgba(0,212,255,0.2); border:1px solid var(--accent);
+            align-self:flex-start; border-bottom-left-radius:5px;
+        }
+        .user-message {
+            background:rgba(123,47,255,0.2); border:1px solid var(--accent2);
+            align-self:flex-end; border-bottom-right-radius:5px;
+        }
+        .chatbot-input {
+            padding:0.8rem; display:flex; gap:0.5rem;
+            border-top:1px solid var(--glass-border);
+        }
+        .chatbot-input input {
+            flex:1; padding:0.8rem; border-radius:25px;
+            border:1px solid var(--accent); background:rgba(255,255,255,0.05);
+            color:white; outline:none; font-size:0.9rem;
+        }
+        .chatbot-input button {
+            width:45px; height:45px; border-radius:50%;
+            background:var(--accent); border:none; color:var(--bg);
+            cursor:pointer; font-size:1.2rem; transition:all 0.3s ease;
+        }
+        .chatbot-input button:hover { background:var(--accent2); color:white; }
+
+        .fade-in {
+            opacity:0; transform:translateY(30px);
+            transition:all 0.8s ease;
+        }
+        .fade-in.visible { opacity:1; transform:translateY(0); }
+
+        @media (max-width:1024px) {
+            .stats-grid { grid-template-columns:repeat(2, 1fr); }
+            .quality-grid, .portfolio-grid { grid-template-columns:repeat(2, 1fr); }
+            .footer-content { grid-template-columns:1fr 1fr; }
+        }
+        @media (max-width:768px) {
+            .nav-links { display:none; }
+            .mobile-menu-btn { display:block; }
+            .hero h1 { font-size:2.2rem; }
+            .stats-grid, .quality-grid, .portfolio-grid { grid-template-columns:1fr; }
+            .chatbot-window { width:320px; height:480px; }
+            .footer-content { grid-template-columns:1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 3D Canvas -->
+    <canvas id="three-canvas"></canvas>
+
+    <!-- Content Overlay -->
+    <div class="content-overlay">
+
+        <!-- Navigation -->
+        <nav id="navbar">
+            <a href="#" class="logo">
+                <i class="fas fa-id-card"></i> TechSmart ID Hub
+            </a>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#quality">Quality</a></li>
+                <li><a href="#portfolio">Portfolio</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+            <a href="https://wa.me/254792122301" class="cta-btn" target="_blank">
+                <i class="fab fa-whatsapp"></i> WhatsApp
+            </a>
+            <button class="mobile-menu-btn" id="mobileToggle">☰</button>
+        </nav>
+
+        <!-- Hero Section -->
+        <section class="hero" id="home">
+            <div class="hero-content">
+                <div class="hero-badge">
+                    <i class="fas fa-map-marker-alt"></i> Kakamega, Kenya
+                </div>
+                <h1>Premium Student IDs<br><span class="gradient-text">Made in Kenya</span></h1>
+                <p>We're a Kenyan startup crafting durable, professional student ID cards for schools, colleges & universities. From MMUST to Kakamega High — we deliver quality that lasts.</p>
+                <div class="hero-buttons">
+                    <a href="https://wa.me/254792122301" class="btn btn-primary" target="_blank">
+                        <i class="fab fa-whatsapp"></i> Order via WhatsApp
+                    </a>
+                    <a href="mailto:novanbryan37@gmail.com" class="btn btn-secondary">
+                        <i class="fas fa-envelope"></i> Email Us
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Stats Section -->
+        <section class="stats">
+            <div class="stats-grid">
+                <div class="stat-card fade-in">
+                    <span class="stat-number" data-target="15">0</span>
+                    <span class="stat-label">Schools Served</span>
+                </div>
+                <div class="stat-card fade-in">
+                    <span class="stat-number" data-target="500">0</span>
+                    <span class="stat-label">IDs Printed</span>
+                </div>
+                <div class="stat-card fade-in">
+                    <span class="stat-number" data-target="100">0</span>
+                    <span class="stat-label">Satisfaction %</span>
+                </div>
+                <div class="stat-card fade-in">
+                    <span class="stat-number" data-target="48">0</span>
+                    <span class="stat-label">Hour Turnaround</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Quality Section -->
+        <section class="section" id="quality">
+            <div class="section-inner">
+                <div class="section-header fade-in">
+                    <div class="section-label">· Why Choose Us ·</div>
+                    <h2 class="section-title">Uncompromising Quality</h2>
+                    <p class="section-desc">Every ID card crafted with premium materials and cutting-edge printing — built to withstand Kenya's climate and daily student life.</p>
+                </div>
+                <div class="quality-grid">
+                    <div class="quality-card fade-in">
+                        <div class="quality-icon">🛡️</div>
+                        <h3>Weather-Resistant</h3>
+                        <p>Our PVC cards won't fade in Kenya's sun or wrinkle in the rain. Perfect for students who walk long distances.</p>
+                    </div>
+                    <div class="quality-card fade-in">
+                        <div class="quality-icon">🎨</div>
+                        <h3>School Colors Pop</h3>
+                        <p>We precisely match your school's colors. MMUST maroon, Kakamega High blue — we get it right.</p>
+                    </div>
+                    <div class="quality-card fade-in">
+                        <div class="quality-icon">💰</div>
+                        <h3>Student-Friendly Prices</h3>
+                        <p>From KSh 150 per card. Bulk orders get discounts. We understand school budgets in Kenya.</p>
+                    </div>
+                    <div class="quality-card fade-in">
+                        <div class="quality-icon">⚡</div>
+                        <h3>48-Hour Delivery</h3>
+                        <p>Based in Kakamega. We serve Western Kenya fast — Kisumu, Bungoma, Busia, and beyond.</p>
+                    </div>
+                    <div class="quality-card fade-in">
+                        <div class="quality-icon">🔒</div>
+                        <h3>Anti-Forgery</h3>
+                        <p>Optional holographic overlays and UV printing to prevent fake IDs in your school.</p>
+                    </div>
+                    <div class="quality-card fade-in">
+                        <div class="quality-icon">🤝</div>
+                        <h3>Founder-Led Service</h3>
+                        <p>You talk directly to the founder. No call centers. We treat every school like our own community.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Portfolio Section -->
+        <section class="section" id="portfolio">
+            <div class="section-inner">
+                <div class="section-header fade-in">
+                    <div class="section-label">· Our Recent Work ·</div>
+                    <h2 class="section-title">Real Schools, Real IDs</h2>
+                    <p class="section-desc">ID cards we've printed for schools across Western Kenya.</p>
+                </div>
+                <div class="portfolio-grid">
+                    <div class="portfolio-item fade-in">
+                        <div class="portfolio-content">
+                            <span style="font-size:4rem;">🏫</span>
+                            <h3>MMUST University</h3>
+                            <p>500 Student IDs • Barcode + Photo</p>
+                        </div>
+                    </div>
+                    <div class="portfolio-item fade-in">
+                        <div class="portfolio-content">
+                            <span style="font-size:4rem;">🎓</span>
+                            <h3>Kakamega High School</h3>
+                            <p>800 Form 3 & 4 IDs • Holographic Seal</p>
+                        </div>
+                    </div>
+                    <div class="portfolio-item fade-in">
+                        <div class="portfolio-content">
+                            <span style="font-size:4rem;">📚</span>
+                            <h3>Maseno School</h3>
+                            <p>600 Student IDs • Watermarked</p>
+                        </div>
+                    </div>
+                    <div class="portfolio-item fade-in">
+                        <div class="portfolio-content">
+                            <span style="font-size:4rem;">🏥</span>
+                            <h3>Kisumu Medical College</h3>
+                            <p>300 IDs • Professional Layout</p>
+                        </div>
+                    </div>
+                    <div class="portfolio-item fade-in">
+                        <div class="portfolio-content">
+                            <span style="font-size:4rem;">🌍</span>
+                            <h3>Lurambi Secondary</h3>
+                            <p>400 IDs • Community School Package</p>
+                        </div>
+                    </div>
+                    <div class="portfolio-item fade-in">
+                        <div class="portfolio-content">
+                            <span style="font-size:4rem;">💼</span>
+                            <h3>Bungoma Teachers College</h3>
+                            <p>250 Staff & Student IDs</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA Section -->
+        <section class="cta-section" id="contact">
+            <div class="cta-box fade-in">
+                <h2>Ready to Get Your School IDs?</h2>
+                <p>We're a new Kenyan startup passionate about quality. Let's talk about your school's needs.</p>
+                <div style="display:flex; gap:1rem; justify-content:center; flex-wrap:wrap;">
+                    <a href="https://wa.me/254792122301" class="btn btn-primary" target="_blank">
+                        <i class="fab fa-whatsapp"></i> Chat on WhatsApp
+                    </a>
+                    <a href="tel:+254792122301" class="btn btn-secondary">
+                        <i class="fas fa-phone"></i> Call Now
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer>
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <a href="#" class="logo"><i class="fas fa-id-card"></i> TechSmart ID Hub</a>
+                    <p>Premium student ID printing in Kakamega. Serving schools across Western Kenya with quality, affordable solutions.</p>
+                </div>
+                <div class="footer-links">
+                    <h4>Services</h4>
+                    <ul>
+                        <li><a href="#">Student IDs</a></li>
+                        <li><a href="#">Staff IDs</a></li>
+                        <li><a href="#">School Badges</a></li>
+                        <li><a href="#">Custom Design</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="#home">Home</a></li>
+                        <li><a href="#quality">Quality</a></li>
+                        <li><a href="#portfolio">Portfolio</a></li>
+                        <li><a href="#contact">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Contact</h4>
+                    <ul>
+                        <li><i class="fas fa-envelope"></i> novanbryan37@gmail.com</li>
+                        <li><i class="fas fa-phone"></i> +254 792 122 301</li>
+                        <li><i class="fas fa-map-marker-alt"></i> Lurambi, Near Alfa Cafe, Kakamega</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2024 TechSmart ID Hub. Built in Kakamega, Kenya 🇰🇪</p>
+                <div class="social-icons">
+                    <a href="https://wa.me/254792122301" target="_blank"><i class="fab fa-whatsapp"></i></a>
+                    <a href="mailto:novanbryan37@gmail.com"><i class="fas fa-envelope"></i></a>
+                    <a href="tel:+254792122301"><i class="fas fa-phone"></i></a>
+                    <a href="#"><i class="fab fa-facebook"></i></a>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Chatbot -->
+    <div class="chatbot-container">
+        <div class="chatbot-window" id="chatbotWindow">
+            <div class="chatbot-header">
+                <span><i class="fas fa-robot"></i> TechSmart Assistant</span>
+                <button onclick="toggleChatbot()" style="background:none;border:none;color:white;cursor:pointer;font-size:1.2rem;">✕</button>
+            </div>
+            <div class="chatbot-messages" id="chatMessages"></div>
+            <div class="chatbot-input">
+                <input type="text" id="userInput" placeholder="Type your message..." onkeypress="if(event.key==='Enter')sendMessage()">
+                <button onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
+                <button onclick="sendChatTranscript()" title="Email this conversation" style="width:45px;height:45px;border-radius:50%;background:var(--accent2);border:none;color:white;cursor:pointer;font-size:1.2rem;margin-left:5px;">
+                    <i class="fas fa-envelope"></i>
+                </button>
+            </div>
+        </div>
+        <button class="chatbot-toggle" onclick="toggleChatbot()">
+            <i class="fas fa-comments"></i>
+        </button>
+    </div>
+
+    <!-- Three.js Background with Realistic ID Cards -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        // ============ 3D SCENE SETUP ============
+        const canvas = document.getElementById('three-canvas');
+        const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        renderer.toneMappingExposure = 1.2;
+
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 100);
+        camera.position.z = 8;
+        camera.position.y = 0.5;
+
+        // ============ LIGHTING ============
+        const ambientLight = new THREE.AmbientLight('#334466', 2.5);
+        scene.add(ambientLight);
+        const mainLight = new THREE.DirectionalLight('#ffffff', 3);
+        mainLight.position.set(5, 5, 5);
+        scene.add(mainLight);
+
+        const accentLight1 = new THREE.PointLight('#00d4ff', 30, 15);
+        accentLight1.position.set(3, 1, 3);
+        scene.add(accentLight1);
+        const accentLight2 = new THREE.PointLight('#7b2fff', 25, 15);
+        accentLight2.position.set(-3, -1, 2);
+        scene.add(accentLight2);
+        const accentLight3 = new THREE.PointLight('#daa520', 15, 10);
+        accentLight3.position.set(0, 3, -2);
+        scene.add(accentLight3);
+
+        // ============ GLOWING PARTICLES ============
+        const particlesCount = 800;
+        const positions = new Float32Array(particlesCount * 3);
+        const colors = new Float32Array(particlesCount * 3);
+        const sizes = new Float32Array(particlesCount);
+
+        const colorPalette = [
+            new THREE.Color('#00d4ff'),
+            new THREE.Color('#7b2fff'),
+            new THREE.Color('#daa520'),
+            new THREE.Color('#f4a460'),
+            new THREE.Color('#ffffff'),
+        ];
+
+        for (let i = 0; i < particlesCount; i++) {
+            const i3 = i * 3;
+            positions[i3] = (Math.random() - 0.5) * 20;
+            positions[i3 + 1] = (Math.random() - 0.5) * 14;
+            positions[i3 + 2] = (Math.random() - 0.5) * 10;
+            const color = colorPalette[Math.floor(Math.random() * colorPalette.length)];
+            colors[i3] = color.r;
+            colors[i3 + 1] = color.g;
+            colors[i3 + 2] = color.b;
+            sizes[i] = Math.random() * 0.08 + 0.02;
+        }
+
+        const particlesGeometry = new THREE.BufferGeometry();
+        particlesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        particlesGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+        particlesGeometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+
+        const particlesMaterial = new THREE.PointsMaterial({
+            size: 0.05,
+            vertexColors: true,
+            blending: THREE.AdditiveBlending,
+            depthWrite: false,
+            transparent: true,
+            opacity: 0.8,
+            sizeAttenuation: true,
+        });
+
+        const particles = new THREE.Points(particlesGeometry, particlesMaterial);
+        scene.add(particles);
+
+        // ============ CREATE REALISTIC ID CARD TEXTURES ============
+        function createIDCardTexture(studentName, schoolName, regNumber, year, schoolColor1, schoolColor2) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 512;
+            canvas.height = 320;
+            const ctx = canvas.getContext('2d');
+
+            // Card background with school colors
+            const gradient = ctx.createLinearGradient(0, 0, 512, 320);
+            gradient.addColorStop(0, schoolColor1);
+            gradient.addColorStop(0.5, schoolColor2);
+            gradient.addColorStop(1, schoolColor1);
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, 512, 320);
+
+            // White border
+            ctx.strokeStyle = 'rgba(255,255,255,0.3)';
+            ctx.lineWidth = 4;
+            ctx.strokeRect(8, 8, 496, 304);
+
+            // Header bar
+            ctx.fillStyle = 'rgba(255,255,255,0.9)';
+            ctx.fillRect(12, 12, 488, 45);
+            ctx.fillStyle = schoolColor1;
+            ctx.font = 'bold 22px Inter, Arial';
+            ctx.fillText(schoolName.toUpperCase(), 20, 45);
+
+            // ID title
+            ctx.fillStyle = 'rgba(0,0,0,0.8)';
+            ctx.font = 'bold 14px Inter, Arial';
+            ctx.fillText('STUDENT IDENTIFICATION CARD', 20, 70);
+
+            // Photo placeholder
+            ctx.fillStyle = 'white';
+            ctx.fillRect(25, 85, 100, 120);
+            ctx.fillStyle = '#ccc';
+            ctx.font = 'bold 60px Arial';
+            ctx.fillText('👤', 40, 170);
+            ctx.strokeStyle = schoolColor1;
+            ctx.lineWidth = 3;
+            ctx.strokeRect(25, 85, 100, 120);
+
+            // Student details
+            ctx.fillStyle = 'white';
+            ctx.font = 'bold 18px Inter, Arial';
+            ctx.fillText('Name: ' + studentName, 145, 115);
+            ctx.font = '16px Inter, Arial';
+            ctx.fillText('Reg No: ' + regNumber, 145, 145);
+            ctx.fillText('Year: ' + year, 145, 175);
+            ctx.fillText('Valid Until: Dec 2025', 145, 205);
+
+            // School logo area
+            ctx.fillStyle = 'rgba(255,255,255,0.2)';
+            ctx.fillRect(380, 85, 100, 80);
+            ctx.fillStyle = 'white';
+            ctx.font = '12px Inter, Arial';
+            ctx.fillText('SCHOOL', 400, 120);
+            ctx.fillText('LOGO', 410, 138);
+
+            // Barcode
+            ctx.fillStyle = 'white';
+            ctx.fillRect(25, 240, 250, 40);
+            for (let i = 0; i < 50; i++) {
+                ctx.fillStyle = Math.random() > 0.5 ? '#000' : '#fff';
+                ctx.fillRect(28 + i * 5, 243, 3, 34);
+            }
+
+            // Security features
+            ctx.fillStyle = 'rgba(255,255,255,0.4)';
+            ctx.font = '8px Inter, Arial';
+            ctx.fillText('SECURITY HOLOGRAM', 26, 300);
+            ctx.fillText('TECHSMART ID HUB © 2024', 26, 312);
+
+            // Chip
+            ctx.fillStyle = '#daa520';
+            ctx.fillRect(440, 240, 50, 40);
+            ctx.strokeStyle = '#b8860b';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(440, 240, 50, 40);
+            ctx.fillStyle = '#b8860b';
+            ctx.fillRect(448, 248, 34, 24);
+            ctx.fillStyle = '#daa520';
+            ctx.fillRect(452, 252, 26, 16);
+
+            const texture = new THREE.CanvasTexture(canvas);
+            texture.needsUpdate = true;
+            return texture;
+        }
+
+        // ============ REALISTIC ID CARDS ============
+        const idCards = [];
+        const students = [
+            { name: 'Brian Wafula', school: 'MMUST University', reg: 'MMUST/2023/0892', year: 'Year 2', color1: '#8B0000', color2: '#4A0000' },
+            { name: 'Mercy Chebet', school: 'Kakamega High', reg: 'KHS/2024/1045', year: 'Form 3', color1: '#006400', color2: '#003300' },
+            { name: 'Kevin Otieno', school: 'Maseno School', reg: 'MS/2024/0671', year: 'Form 4', color1: '#000080', color2: '#000040' },
+            { name: 'Faith Njeri', school: 'Butere Girls', reg: 'BG/2024/1234', year: 'Form 2', color1: '#800080', color2: '#400040' },
+            { name: 'James Omondi', school: 'Kisumu Poly', reg: 'KP/2023/0567', year: 'Year 3', color1: '#CC5500', color2: '#803300' },
+            { name: 'Grace Akinyi', school: 'Bungoma High', reg: 'BH/2024/0789', year: 'Form 4', color1: '#006666', color2: '#003333' },
+            { name: 'Peter Kamau', school: 'Nairobi School', reg: 'NS/2024/0901', year: 'Form 3', color1: '#000000', color2: '#333333' },
+            { name: 'Mary Achieng', school: 'Moi University', reg: 'MU/2023/0456', year: 'Year 4', color1: '#8B4513', color2: '#4A2500' },
+        ];
+
+        for (let i = 0; i < students.length; i++) {
+            const student = students[i];
+            const texture = createIDCardTexture(
+                student.name, student.school, student.reg, student.year, student.color1, student.color2
+            );
+
+            const geometry = new THREE.PlaneGeometry(2.5, 1.6);
+            const material = new THREE.MeshPhongMaterial({
+                map: texture,
+                transparent: true,
+                opacity: 0.6,
+                emissive: new THREE.Color(student.color1),
+                emissiveIntensity: 0.2,
+                side: THREE.DoubleSide,
+            });
+
+            const card = new THREE.Mesh(geometry, material);
+            card.position.set(
+                (Math.random() - 0.5) * 14,
+                (Math.random() - 0.5) * 10,
+                (Math.random() - 0.5) * 8 - 1
+            );
+            card.rotation.set(
+                Math.random() * Math.PI * 2,
+                Math.random() * Math.PI * 2,
+                Math.random() * Math.PI * 2
+            );
+
+            scene.add(card);
+            idCards.push({
+                mesh: card,
+                // Much slower rotation speeds
+                rotSpeed: {
+                    x: (Math.random() - 0.5) * 0.001,
+                    y: (Math.random() - 0.5) * 0.002,
+                    z: (Math.random() - 0.5) * 0.0008,
+                },
+                floatSpeed: Math.random() * 0.001 + 0.0005,
+                floatAmp: Math.random() * 0.6 + 0.2,
+                initialY: card.position.y,
+                floatOffset: Math.random() * Math.PI * 2,
+            });
+        }
+
+        // ============ CENTER ORB WITH GLOW ============
+        const orbGeo = new THREE.SphereGeometry(0.5, 64, 64);
+        const orbMat = new THREE.MeshStandardMaterial({
+            color: '#ffffff',
+            roughness: 0.05,
+            metalness: 1,
+            emissive: '#003344',
+            emissiveIntensity: 0.5,
+        });
+        const orb = new THREE.Mesh(orbGeo, orbMat);
+        orb.position.set(0, 0.3, -2);
+        scene.add(orb);
+
+        // Glow ring around orb
+        const glowRingGeo = new THREE.TorusGeometry(0.75, 0.03, 32, 120);
+        const glowRingMat = new THREE.MeshStandardMaterial({
+            color: '#00d4ff',
+            roughness: 0.1,
+            metalness: 0.9,
+            emissive: '#004466',
+            emissiveIntensity: 0.8,
+        });
+        const glowRing = new THREE.Mesh(glowRingGeo, glowRingMat);
+        glowRing.position.copy(orb.position);
+        glowRing.rotation.x = Math.PI / 2;
+        scene.add(glowRing);
+
+        const glowRing2Geo = new THREE.TorusGeometry(0.6, 0.02, 16, 80);
+        const glowRing2Mat = new THREE.MeshStandardMaterial({
+            color: '#7b2fff',
+            roughness: 0.1,
+            metalness: 0.9,
+            emissive: '#220044',
+            emissiveIntensity: 0.6,
+        });
+        const glowRing2 = new THREE.Mesh(glowRing2Geo, glowRing2Mat);
+        glowRing2.position.copy(orb.position);
+        glowRing2.rotation.x = -Math.PI / 3;
+        glowRing2.rotation.y = Math.PI / 4;
+        scene.add(glowRing2);
+
+        // ============ GRID FLOOR ============
+        const gridHelper = new THREE.PolarGridHelper(8, 40, 24, 256, '#222244', '#111122');
+        gridHelper.position.y = -4;
+        scene.add(gridHelper);
+
+        // ============ MOUSE TRACKING ============
+        const mouse = { x: 0, y: 0, targetX: 0, targetY: 0 };
+        document.addEventListener('mousemove', (e) => {
+            mouse.targetX = (e.clientX / window.innerWidth) * 2 - 1;
+            mouse.targetY = -(e.clientY / window.innerHeight) * 2 + 1;
+        });
+
+        let scrollY = 0;
+        window.addEventListener('scroll', () => { scrollY = window.scrollY; });
+
+        // ============ ANIMATION LOOP ============
+        const clock = new THREE.Clock();
+        function animate() {
+            requestAnimationFrame(animate);
+            const time = performance.now() * 0.001;
+
+            mouse.x += (mouse.targetX - mouse.x) * 0.05;
+            mouse.y += (mouse.targetY - mouse.y) * 0.05;
+
+            camera.position.x += (mouse.x * 1.5 - camera.position.x) * 0.03;
+            camera.position.y += (-mouse.y * 0.8 + 0.5 - camera.position.y) * 0.03;
+            camera.lookAt(0, 0, -0.5);
+
+            // Very slow particle rotation
+            particles.rotation.y += 0.0001;
+            particles.rotation.x += 0.00008;
+            particles.rotation.z += 0.00005;
+
+            // Animate ID cards slowly
+            idCards.forEach((card) => {
+                card.mesh.rotation.x += card.rotSpeed.x;
+                card.mesh.rotation.y += card.rotSpeed.y;
+                card.mesh.rotation.z += card.rotSpeed.z;
+                card.mesh.position.y = card.initialY + Math.sin(time * 0.5 + card.floatOffset) * card.floatAmp;
+            });
+
+            // Animate orb slowly
+            orb.rotation.y += 0.001;
+            orb.scale.setScalar(1 + Math.sin(time * 0.8) * 0.04);
+            glowRing.rotation.z += 0.002;
+            glowRing2.rotation.z -= 0.0015;
+            glowRing2.rotation.x += 0.001;
+
+            // Move lights with mouse
+            accentLight1.position.x = 3 + mouse.x * 2;
+            accentLight1.position.y = 1 - mouse.y * 1.5;
+            accentLight2.position.x = -3 + mouse.x * 1.5;
+            accentLight2.position.y = -1 + mouse.y * 1.2;
+
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+
+    <!-- UI Interactions -->
+    <script>
+        // EmailJS
+        (function() { emailjs.init("YOUR_PUBLIC_KEY"); })();
+        const EMAIL_CONFIG = {
+            serviceId: "YOUR_SERVICE_ID",
+            templateId: "YOUR_TEMPLATE_ID",
+            userId: "YOUR_USER_ID",
+            recipientEmail: "novanbryan37@gmail.com"
+        };
+
+        // Navbar
+        const navbar = document.getElementById('navbar');
+        window.addEventListener('scroll', () => {
+            navbar.classList.toggle('scrolled', window.scrollY > 50);
+        });
+
+        // Mobile Menu
+        const mobileToggle = document.getElementById('mobileToggle');
+        const navLinks = document.getElementById('navLinks');
+        mobileToggle.addEventListener('click', () => navLinks.classList.toggle('active'));
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            link.addEventListener('click', () => navLinks.classList.remove('active'));
+        });
+
+        // Chatbot
+        let chatHistory = [];
+        let userInfo = { name: null, email: null, phone: null, school: null };
+        let transcriptSent = false;
+
+        function toggleChatbot() {
+            const window = document.getElementById('chatbotWindow');
+            window.classList.toggle('active');
+            if (window.classList.contains('active') && chatHistory.length === 0) {
+                const welcomeMsg = "👋 Jambo! I'm the TechSmart ID assistant. We print premium student IDs in Kakamega.\n\nHow can I help you today?";
+                addMessage(welcomeMsg, 'bot');
+                chatHistory.push({sender:'bot', message:welcomeMsg, timestamp:new Date().toISOString()});
+            }
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('userInput');
+            const message = input.value.trim();
+            if (!message) return;
+            addMessage(message, 'user');
+            chatHistory.push({sender:'user', message, timestamp:new Date().toISOString()});
+            extractUserInfo(message);
+            const response = generateResponse(message.toLowerCase());
+            setTimeout(() => {
+                addMessage(response, 'bot');
+                chatHistory.push({sender:'bot', message:response, timestamp:new Date().toISOString()});
+                if (shouldAutoSend()) sendChatTranscript();
+            }, 600);
+            input.value = '';
+        }
+
+        function extractUserInfo(text) {
+            const emailMatch = text.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
+            const phoneMatch = text.match(/(0\d{9}|\+254\d{9})/);
+            if (emailMatch) userInfo.email = emailMatch[0];
+            if (phoneMatch) userInfo.phone = phoneMatch[0];
+            if (!userInfo.name && text.length < 50 && !text.includes('@')) userInfo.name = text;
+        }
+
+        function generateResponse(input) {
+            if (input.includes('price') || input.includes('cost')) return '💰 Student IDs from KSh 150 each. Bulk discounts! WhatsApp: +254 792 122 301';
+            if (input.includes('sample')) return '📸 Check our portfolio above or WhatsApp for samples!';
+            if (input.includes('delivery') || input.includes('location')) return '📍 Based in Lurambi, Kakamega. 48-hour turnaround across Western Kenya.';
+            if (input.includes('school')) return '🏫 We serve MMUST, Kakamega High, Maseno School, and more!';
+            return 'Thanks for reaching out! 😊 Ask about pricing, samples, or share your email for a quote.';
+        }
+
+        function shouldAutoSend() {
+            return (chatHistory.filter(m => m.sender === 'user').length >= 5 || userInfo.email) && !transcriptSent;
+        }
+
+        function addMessage(text, sender) {
+            const container = document.getElementById('chatMessages');
+            const div = document.createElement('div');
+            div.className = `message ${sender}-message`;
+            div.innerHTML = text.replace(/\n/g, '<br>');
+            container.appendChild(div);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        async function sendChatTranscript() {
+            if (transcriptSent) return;
+            try {
+                const transcript = chatHistory.map(m => 
+                    `<div style="margin-bottom:10px;padding:10px;background:${m.sender==='bot'?'#e0f7fa':'#f3e5f5'};border-left:4px solid ${m.sender==='bot'?'#00d4ff':'#7b2fff'};"><strong>${m.sender==='bot'?'Bot':'Customer'}:</strong><p>${m.message}</p></div>`
+                ).join('');
+                await emailjs.send(EMAIL_CONFIG.serviceId, EMAIL_CONFIG.templateId, {
+                    to_email: EMAIL_CONFIG.recipientEmail,
+                    from_name: userInfo.name || 'Visitor',
+                    from_email: userInfo.email || 'Not provided',
+                    from_phone: userInfo.phone || 'Not provided',
+                    subject: `Chat - TechSmart ID (${new Date().toLocaleString('en-KE')})`,
+                    transcript_html: transcript,
+                });
+                addMessage('📧 Transcript sent! We\'ll reply soon.', 'bot');
+                transcriptSent = true;
+            } catch (e) {
+                addMessage('📥 Email failed. Contact us directly: novanbryan37@gmail.com', 'bot');
+            }
+        }
+
+        // Scroll Animations
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); });
+        }, {threshold:0.1});
+        document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+        // Counter Animation
+        const countObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if(entry.isIntersecting) {
+                    const target = parseInt(entry.target.dataset.target);
+                    animateValue(entry.target, 0, target, 2000);
+                    countObserver.unobserve(entry.target);
+                }
+            });
+        }, {threshold:0.5});
+        document.querySelectorAll('.stat-number').forEach(el => countObserver.observe(el));
+
+        function animateValue(el, start, end, duration) {
+            let startTime;
+            const step = (timestamp) => {
+                if(!startTime) startTime = timestamp;
+                const progress = Math.min((timestamp-startTime)/duration, 1);
+                el.innerHTML = Math.floor(progress*(end-start)+start)+(end===100?'%':'+');
+                if(progress<1) requestAnimationFrame(step);
+            };
+            requestAnimationFrame(step);
+        }
+
+        // Smooth Scroll
+        document.querySelectorAll('a[href^="#"]').forEach(a => {
+            a.addEventListener('click', function(e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href'))?.scrollIntoView({behavior:'smooth'});
+            });
+        });
+
+        console.log('%c🚀 TechSmart ID Hub %c3D Experience Ready',
+            'font-size:1.4em;font-weight:bold;color:#00d4ff;',
+            'font-size:1em;color:#aaa;');
+    </script>
+</body>
+</html>
